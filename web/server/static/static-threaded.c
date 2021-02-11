@@ -248,8 +248,6 @@ static int web_server_rcv_callback(POLLINFO *pi, short int *events) {
     struct web_client *w = (struct web_client *)pi->data;
     int fd = pi->fd;
 
-    //BRING IT TO HERE
-
     if(unlikely(web_client_receive(w) < 0))
         return -1;
 
@@ -396,6 +394,7 @@ void *socket_listen_main_static_threaded_worker(void *ptr) {
                         , web_server_snd_callback
                         , web_server_tmr_callback
                         , web_allow_connections_from
+                        , web_allow_connections_dns
                         , NULL
                         , web_client_first_request_timeout
                         , web_client_timeout

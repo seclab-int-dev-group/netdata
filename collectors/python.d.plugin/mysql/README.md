@@ -1,12 +1,29 @@
-# mysql
+<!--
+title: "MySQL monitoring with Netdata"
+custom_edit_url: https://github.com/netdata/netdata/edit/master/collectors/python.d.plugin/mysql/README.md
+sidebar_label: "MySQL"
+-->
 
-Module monitors one or more mysql servers
+# MySQL monitoring with Netdata
 
-**Requirements:**
+Monitors one or more MySQL servers.
+
+## Requirements
 
 -   python library [MySQLdb](https://github.com/PyMySQL/mysqlclient-python) (faster) or [PyMySQL](https://github.com/PyMySQL/PyMySQL) (slower)
+-   `netdata` local user to connect to the MySQL server. 
 
-It will produce following charts (if data is available):
+To create the `netdata` user, execute the following in the MySQL shell:
+
+```sh
+create user 'netdata'@'localhost';
+grant usage on *.* to 'netdata'@'localhost';
+flush privileges;
+```
+The `netdata` user will have the ability to connect to the MySQL server on `localhost` without a password. 
+It will only be able to gather MySQL statistics without being able to alter or affect MySQL operations in any way. 
+
+This module will produce following charts (if data is available):
 
 1.  **Bandwidth** in kilobits/s
 
@@ -28,7 +45,7 @@ It will produce following charts (if data is available):
     -   cache hits
     -   replace
 
-4.  **Handlerse** in handlers/s
+4.  **Handlers** in handlers/s
 
     -   commit
     -   delete
@@ -50,7 +67,7 @@ It will produce following charts (if data is available):
     -   immediate
     -   waited
 
-6.  **Table Select Join Issuess** in joins/s
+6.  **Table Select Join Issues** in joins/s
 
     -   full join
     -   full range join
@@ -58,7 +75,7 @@ It will produce following charts (if data is available):
     -   range check
     -   scan
 
-7.  **Table Sort Issuess** in joins/s
+7.  **Table Sort Issues** in joins/s
 
     -   merge passes
     -   range
@@ -147,7 +164,7 @@ It will produce following charts (if data is available):
     -   updated
     -   deleted
 
-24. **InnoDB Buffer Pool Pagess** in pages
+24. **InnoDB Buffer Pool Pages** in pages
 
     -   data
     -   dirty
@@ -241,12 +258,12 @@ It will produce following charts (if data is available):
     -   sql
     -   io
 
-42. **Replicated Writesets** in writesets/s
+42. **Galera Replicated Writesets** in writesets/s
 
     -   rx
     -   tx
 
-43. **Replicated Bytes** in KiB/s
+43. **Galera Replicated Bytes** in KiB/s
 
     -   rx
     -   tx
@@ -256,16 +273,48 @@ It will produce following charts (if data is available):
     -   rx
     -   tx
 
-45. **Replication Conflicts** in transactions
+45. **Galera Replication Conflicts** in transactions
 
     -   bf aborts
     -   cert fails
 
-46. **Flow Control** in ms
+46. **Galera Flow Control** in ms
 
     -   paused
 
-47. **Users CPU time** in percentage
+47. **Galera Cluster Status** in status
+
+    -   status
+
+48. **Galera Cluster State** in state
+
+    -   state
+
+49. **Galera Number of Nodes in the Cluster** in num
+
+    -   nodes
+
+50. **Galera Total Weight of the Current Members in the Cluster** in weight
+
+    -   weight
+
+51. **Galera Whether the Node is Connected to the Cluster** in boolean
+
+    -   connected
+
+52. **Galera Whether the Node is Ready to Accept Queries** in boolean
+
+    -   ready
+
+53. **Galera Open Transactions** in num
+
+    -   open transactions
+
+54. **Galera Total Number of WSRep (applier/rollbacker) Threads** in num
+
+    -   threads
+
+55. **Users CPU time** in percentage
 
     -   users
 
@@ -285,7 +334,15 @@ It will produce following charts (if data is available):
     -   update
     -   other
 
-## configuration
+## Configuration
+
+Edit the `python.d/mysql.conf` configuration file using `edit-config` from the Netdata [config
+directory](/docs/configure/nodes.md), which is typically at `/etc/netdata`.
+
+```bash
+cd /etc/netdata   # Replace this path with your Netdata config directory, if different
+sudo ./edit-config python.d/mysql.conf
+```
 
 You can provide, per server, the following:
 
@@ -299,7 +356,8 @@ You can provide, per server, the following:
 
     -   key: the path name of the client private key file.
     -   cert: the path name of the client public key certificate file.
-    -   ca: the path name of the Certificate Authority (CA) certificate file. This option, if used, must specify the same certificate used by the server.
+    -   ca: the path name of the Certificate Authority (CA) certificate file. This option, if used, must specify the
+        same certificate used by the server.
     -   capath: the path name of the directory that contains trusted SSL CA certificate files.
     -   cipher: the list of permitted ciphers for SSL encryption.
 
@@ -326,9 +384,12 @@ remote:
   port     : 9000
 ```
 
-If no configuration is given, module will attempt to connect to mysql server via unix socket at `/var/run/mysqld/mysqld.sock` without password and with username `root`
+If no configuration is given, the module will attempt to connect to MySQL server via a unix socket at
+`/var/run/mysqld/mysqld.sock` without password and with username `root` or `netdata` (you granted permissions for `netdata` user in the Requirements section of this document).
 
-`userstats` graph works only if you enable such plugin in MariaDB server and set proper mysql priviliges (SUPER or PROCESS). For more detail please check [MariaDB User Statistics page](https://mariadb.com/kb/en/library/user-statistics/)
+`userstats` graph works only if you enable the plugin in MariaDB server and set proper MySQL privileges (SUPER or
+PROCESS). For more details, please check the [MariaDB User Statistics
+page](https://mariadb.com/kb/en/library/user-statistics/)
 
 ---
 

@@ -1,6 +1,12 @@
-# elasticsearch
+<!--
+title: "Elasticsearch monitoring with Netdata"
+custom_edit_url: https://github.com/netdata/netdata/edit/master/collectors/python.d.plugin/elasticsearch/README.md
+sidebar_label: "Elasticsearch"
+-->
 
-This module monitors Elasticsearch performance and health metrics.
+# Elasticsearch monitoring with Netdata
+
+Monitors [Elasticsearch](https://www.elastic.co/products/elasticsearch) performance and health metrics.
 
 It produces:
 
@@ -16,7 +22,7 @@ It produces:
     -   Time spent on indexing, refreshing, flushing
     -   Indexing and flushing latency
 
-3.  **Memory usage and garbace collection** charts:
+3.  **Memory usage and garbage collection** charts:
 
     -   JVM heap currently in use, committed
     -   Count of garbage collections
@@ -51,19 +57,37 @@ It produces:
     -   Store statistics
     -   Indices and shards statistics
 
-## configuration
+9.  **Indices** charts (per index statistics, disabled by default):
+
+    -   Docs count
+    -   Store size
+    -   Num of replicas
+    -   Health status
+
+## Configuration
+
+Edit the `python.d/elasticsearch.conf` configuration file using `edit-config` from the Netdata [config
+directory](/docs/configure/nodes.md), which is typically at `/etc/netdata`.
+
+```bash
+cd /etc/netdata   # Replace this path with your Netdata config directory, if different
+sudo ./edit-config python.d/elasticsearch.conf
+```
 
 Sample:
 
 ```yaml
 local:
-  host               : 'ipaddress'    # Elasticsearch server ip address or hostname
-  port               : 'port'         # Port on which elasticsearch listens
-  cluster_health     :  True/False    # Calls to cluster health elasticsearch API. Enabled by default.
-  cluster_stats      :  True/False    # Calls to cluster stats elasticsearch API. Enabled by default.
+  host               : 'ipaddress'    # Elasticsearch server ip address or hostname.
+  port               : 'port'         # Port on which elasticsearch listens.
+  scheme             : 'http'         # URL scheme. Use 'https' if your elasticsearch uses TLS.
+  node_status        :  yes/no        # Get metrics from "/_nodes/_local/stats". Enabled by default.
+  cluster_health     :  yes/no        # Get metrics from "/_cluster/health". Enabled by default.
+  cluster_stats      :  yes/no        # Get metrics from "'/_cluster/stats". Enabled by default.
+  indices_stats      :  yes/no        # Get metrics from "/_cat/indices". Disabled by default.
 ```
 
-If no configuration is given, module will fail to run.
+If no configuration is given, module will try to connect to `http://127.0.0.1:9200`.
 
 ---
 

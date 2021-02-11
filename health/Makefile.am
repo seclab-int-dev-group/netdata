@@ -8,22 +8,28 @@ SUBDIRS = \
     $(NULL)
 
 CLEANFILES = \
-	$(NULL)
+    $(NULL)
 
 dist_noinst_DATA = \
-	README.md \
-	$(NULL)
+    README.md \
+    $(NULL)
 
 userhealthconfigdir=$(configdir)/health.d
 dist_userhealthconfig_DATA = \
-    .keep \
     $(NULL)
+
+# Explicitly install directories to avoid permission issues due to umask
+install-exec-local:
+	$(INSTALL) -d $(DESTDIR)$(userhealthconfigdir)
 
 healthconfigdir=$(libconfigdir)/health.d
 dist_healthconfig_DATA = \
     health.d/adaptec_raid.conf \
+    health.d/am2320.conf \
+    health.d/anomalies.conf \
     health.d/apache.conf \
     health.d/apcupsd.conf \
+    health.d/apps_plugin.conf \
     health.d/backend.conf \
     health.d/bcache.conf \
     health.d/beanstalkd.conf \
@@ -33,12 +39,15 @@ dist_healthconfig_DATA = \
     health.d/ceph.conf \
     health.d/cgroups.conf \
     health.d/cpu.conf \
+    health.d/cockroachdb.conf \
     health.d/couchdb.conf \
     health.d/disks.conf \
     health.d/dnsmasq_dhcp.conf \
+    health.d/dns_query.conf \
     health.d/dockerd.conf \
     health.d/elasticsearch.conf \
     health.d/entropy.conf \
+    health.d/exporting.conf \
     health.d/fping.conf \
     health.d/ioping.conf \
     health.d/fronius.conf \
@@ -70,11 +79,13 @@ dist_healthconfig_DATA = \
     health.d/portcheck.conf \
     health.d/postgres.conf \
     health.d/processes.conf \
+    health.d/pulsar.conf \
     health.d/qos.conf \
     health.d/ram.conf \
     health.d/redis.conf \
     health.d/retroshare.conf \
     health.d/riakkv.conf \
+    health.d/scaleio.conf \
     health.d/softnet.conf \
     health.d/squid.conf \
     health.d/stiebeleltron.conf \
@@ -85,10 +96,13 @@ dist_healthconfig_DATA = \
     health.d/tcp_orphans.conf \
     health.d/tcp_resets.conf \
     health.d/udp_errors.conf \
+    health.d/unbound.conf \
     health.d/varnish.conf \
     health.d/vcsa.conf \
+    health.d/vernemq.conf \
     health.d/vsphere.conf \
     health.d/web_log.conf \
+    health.d/whoisquery.conf \
     health.d/wmi.conf \
     health.d/x509check.conf \
     health.d/zfs.conf \

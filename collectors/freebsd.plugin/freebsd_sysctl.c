@@ -470,7 +470,7 @@ int do_dev_cpu_temperature(int update_every, usec_t dt) {
         pcpu_temperature = reallocz(pcpu_temperature, sizeof(int) * number_of_cpus);
         mib = reallocz(mib, sizeof(int) * number_of_cpus * 4);
         if (unlikely(number_of_cpus > old_number_of_cpus))
-            memset(&mib[old_number_of_cpus * 4], 0, sizeof(RRDDIM) * (number_of_cpus - old_number_of_cpus));
+            memset(&mib[old_number_of_cpus * 4], 0, sizeof(int) * (number_of_cpus - old_number_of_cpus) * 4);
     }
     for (i = 0; i < number_of_cpus; i++) {
         if (unlikely(!(mib[i * 4])))
@@ -678,7 +678,7 @@ int do_hw_intcnt(int update_every, usec_t dt) {
 
                     p = intrnames + i * (MAXCOMLEN + 1);
                     if (unlikely((intrcnt[i] != 0) && (*(char *) p != 0))) {
-                        RRDDIM *rd_interrupts = rrddim_find(st_interrupts, p);
+                        RRDDIM *rd_interrupts = rrddim_find_active(st_interrupts, p);
 
                         if (unlikely(!rd_interrupts))
                             rd_interrupts = rrddim_add(st_interrupts, p, NULL, 1, 1, RRD_ALGORITHM_INCREMENTAL);

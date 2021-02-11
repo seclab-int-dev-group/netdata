@@ -81,7 +81,7 @@ struct tc_device {
     RRDSET *st_tokens;
     RRDSET *st_ctokens;
 
-    avl_tree classes_index;
+    avl_tree_type classes_index;
 
     struct tc_class *classes;
     struct tc_class *last_class;
@@ -102,7 +102,7 @@ static int tc_device_compare(void* a, void* b) {
     else return strcmp(((struct tc_device *)a)->id, ((struct tc_device *)b)->id);
 }
 
-avl_tree tc_device_root_index = {
+avl_tree_type tc_device_root_index = {
         NULL,
         tc_device_compare
 };
@@ -851,12 +851,11 @@ static void tc_main_cleanup(void *ptr) {
 
     if(tc_child_pid) {
         info("TC: killing with SIGTERM tc-qos-helper process %d", tc_child_pid);
-        if(killpid(tc_child_pid, SIGTERM) != -1) {
+        if(killpid(tc_child_pid) != -1) {
             siginfo_t info;
 
             info("TC: waiting for tc plugin child process pid %d to exit...", tc_child_pid);
             waitid(P_PID, (id_t) tc_child_pid, &info, WEXITED);
-            // info("TC: finished tc plugin child process pid %d.", tc_child_pid);
         }
 
         tc_child_pid = 0;

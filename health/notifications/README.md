@@ -1,7 +1,13 @@
-# Netdata alarm notifications
+<!--
+title: "Alarm notifications"
+description: "Reference documentation for Netdata's alarm notification feature, which supports dozens of endpoints, user roles, and more."
+custom_edit_url: https://github.com/netdata/netdata/edit/master/health/notifications/README.md
+-->
+
+# Alarm notifications
 
 The `exec` line in health configuration defines an external script that will be called once
-the alarm is triggered. The default script is **[alarm-notify.sh](alarm-notify.sh.in)**.
+the alarm is triggered. The default script is `alarm-notify.sh`.
 
 You can change the default script globally by editing `/etc/netdata/netdata.conf`.
 
@@ -13,11 +19,10 @@ You can change the default script globally by editing `/etc/netdata/netdata.conf
 
 It uses **roles**. For example `sysadmin`, `webmaster`, `dba`, etc.
 
-Each alarm is assigned to one or more roles, using the `to` line of the alarm configuration.
-Then `alarm-notify.sh` uses its own configuration file `/etc/netdata/health_alarm_notify.conf`
-the default is [here](health_alarm_notify.conf)
-(to edit it on your system run `/etc/netdata/edit-config health_alarm_notify.conf`)
-to find the destination address of the notification for each method.
+Each alarm is assigned to one or more roles, using the `to` line of the alarm configuration. Then `alarm-notify.sh` uses
+its own configuration file `/etc/netdata/health_alarm_notify.conf`. To edit it on your system, run
+`/etc/netdata/edit-config health_alarm_notify.conf` and find the destination address of the notification for each
+method.
 
 Each role may have one or more destinations.
 
@@ -31,15 +36,25 @@ So, for example the `sysadmin` role may send:
 
 ## Configuration
 
-Edit [`/etc/netdata/health_alarm_notify.conf`](health_alarm_notify.conf)
-by running `/etc/netdata/edit-config health_alarm_notify.conf`:
+Edit `/etc/netdata/health_alarm_notify.conf` by running `/etc/netdata/edit-config health_alarm_notify.conf`:
 
 -   settings per notification method:
 
      all notification methods except email, require some configuration
      (i.e. API keys, tokens, destination rooms, channels, etc).
 
-2.  **recipients** per **role** per **notification method**
+-  **recipients** per **role** per **notification method**
+
+```sh
+grep sysadmin /etc/netdata/health_alarm_notify.conf
+
+role_recipients_email[sysadmin]="${DEFAULT_RECIPIENT_EMAIL}"
+role_recipients_pushover[sysadmin]="${DEFAULT_RECIPIENT_PUSHOVER}"
+role_recipients_pushbullet[sysadmin]="${DEFAULT_RECIPIENT_PUSHBULLET}"
+role_recipients_telegram[sysadmin]="${DEFAULT_RECIPIENT_TELEGRAM}"
+role_recipients_slack[sysadmin]="${DEFAULT_RECIPIENT_SLACK}"
+...
+```
 
 ## Testing Notifications
 

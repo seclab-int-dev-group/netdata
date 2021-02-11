@@ -137,10 +137,12 @@ int json_callback_print(JSON_ENTRY *e)
  * @param e the output structure
  */
 static inline void json_jsonc_set_string(JSON_ENTRY *e,char *key,const char *value) {
-    size_t length = strlen(key);
+    size_t len = strlen(key);
+    if(len > JSON_NAME_LEN)
+        len = JSON_NAME_LEN;
     e->type = JSON_STRING;
-    memcpy(e->name,key,length);
-    e->name[length] = 0x00;
+    memcpy(e->name,key,len);
+    e->name[len] = 0x00;
     e->data.string = (char *) value;
 }
 
@@ -157,6 +159,16 @@ static inline void json_jsonc_set_string(JSON_ENTRY *e,char *key,const char *val
 static inline void json_jsonc_set_boolean(JSON_ENTRY *e,int value) {
     e->type = JSON_BOOLEAN;
     e->data.boolean = value;
+}
+
+static inline void json_jsonc_set_integer(JSON_ENTRY *e, char *key, int64_t value) {
+    size_t len = strlen(key);
+    if(len > JSON_NAME_LEN)
+        len = JSON_NAME_LEN;
+    e->type = JSON_NUMBER;
+    memcpy(e->name, key, len);
+    e->name[len] = 0;
+    e->data.number = value;
 }
 
 /**
@@ -284,18 +296,13 @@ size_t json_walk_primitive(char *js, jsmntok_t *t, size_t start, JSON_ENTRY *e)
  * @param t the tokens
  * @param nest the length of structure t
  * @param start the first position
- * @param e the output structure.
+ * @param e the structure with values and callback to be used inside the function.
  *
  * @return It returns the array length
  */
 size_t json_walk_array(char *js, jsmntok_t *t, size_t nest, size_t start, JSON_ENTRY *e)
 {
-    JSON_ENTRY ne = {
-            .name = "",
-            .fullname = "",
-            .callback_data = NULL,
-            .callback_function = NULL
-    };
+    JSON_ENTRY ne;
 
     char old = js[t[start].end];
     js[t[start].end] = '\0';
@@ -304,7 +311,7 @@ size_t json_walk_array(char *js, jsmntok_t *t, size_t nest, size_t start, JSON_E
     memcpy(&ne, e, sizeof(JSON_ENTRY));
     ne.type = JSON_ARRAY;
     ne.data.items = t[start].size;
-    ne.callback_function = NULL;
+    ne.callback_function = e->callback_function;
     ne.name[0]='\0';
     ne.fullname[0]='\0';
     if(e->callback_function) e->callback_function(&ne);
@@ -315,7 +322,7 @@ size_t json_walk_array(char *js, jsmntok_t *t, size_t nest, size_t start, JSON_E
     start++;
     for(i = 0; i < size ; i++) {
         ne.pos = i;
-        if (!e->name || !e->fullname || strlen(e->name) > JSON_NAME_LEN  - 24 || strlen(e->fullname) > JSON_FULLNAME_LEN -24) {
+        if (strlen(e->name) > JSON_NAME_LEN  - 24 || strlen(e->fullname) > JSON_FULLNAME_LEN -24) {
             info("JSON: JSON walk_array ignoring element with name:%s fullname:%s",e->name, e->fullname);
             continue;
         }
@@ -370,7 +377,7 @@ size_t json_walk_object(char *js, jsmntok_t *t, size_t nest, size_t start, JSON_
     ne.original_string = &js[t[start].start];
     memcpy(&ne, e, sizeof(JSON_ENTRY));
     ne.type = JSON_OBJECT;
-    ne.callback_function = NULL;
+    ne.callback_function = e->callback_function;
     if(e->callback_function) e->callback_function(&ne);
     js[t[start].end] = old;
 
@@ -451,6 +458,9 @@ size_t json_walk(json_object *t, void *callback_data, int (*callback_function)(s
             callback_function(&e);
         } else if (type == json_type_boolean) {
             json_jsonc_set_boolean(&e,json_object_get_boolean(val));
+            callback_function(&e);
+        } else if (type == json_type_int) {
+            json_jsonc_set_integer(&e,key,json_object_get_int64(val));
             callback_function(&e);
         }
     }

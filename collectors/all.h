@@ -90,6 +90,7 @@
 #define NETDATA_CHART_PRIO_MEM_KSM_RATIOS             1302
 #define NETDATA_CHART_PRIO_MEM_NUMA                   1400
 #define NETDATA_CHART_PRIO_MEM_NUMA_NODES             1410
+#define NETDATA_CHART_PRIO_MEM_PAGEFRAG               1450
 #define NETDATA_CHART_PRIO_MEM_HW                     1500
 #define NETDATA_CHART_PRIO_MEM_HW_ECC_CE              1550
 #define NETDATA_CHART_PRIO_MEM_HW_ECC_UE              1560
@@ -281,6 +282,8 @@
 #define NETDATA_CHART_PRIO_TC_QOS_TOCKENS             7030
 #define NETDATA_CHART_PRIO_TC_QOS_CTOCKENS            7040
 
+// Infiniband
+#define NETDATA_CHART_PRIO_INFINIBAND                 7100
 
 // Netfilter
 
@@ -309,10 +312,16 @@
 #define NETDATA_CHART_PRIO_MDSTAT_SPEED               9006
 
 // Linux Power Supply
+
 #define NETDATA_CHART_PRIO_POWER_SUPPLY_CAPACITY      9500 // 4 charts per power supply
 #define NETDATA_CHART_PRIO_POWER_SUPPLY_CHARGE        9501
 #define NETDATA_CHART_PRIO_POWER_SUPPLY_ENERGY        9502
 #define NETDATA_CHART_PRIO_POWER_SUPPLY_VOLTAGE       9503
+
+
+// Wireless
+
+#define NETDATA_CHART_PRIO_WIRELESS_IFACE	     7110
 
 // CGROUPS
 
