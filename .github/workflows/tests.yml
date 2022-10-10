@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
       - name: Prepare environment
         run: |
           ./packaging/installer/install-required-packages.sh --dont-wait --non-interactive netdata-all
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.1.0
       - name: Prepare environment
         run: |
           ./packaging/installer/install-required-packages.sh --dont-wait --non-interactive netdata-all
