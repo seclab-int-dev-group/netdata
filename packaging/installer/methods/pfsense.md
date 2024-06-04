@@ -2,9 +2,12 @@
 title: "Install Netdata on pfSense"
 description: "Install Netdata on pfSense to monitor the health and performance of firewalls with thousands of real-time, per-second metrics."
 custom_edit_url: https://github.com/netdata/netdata/edit/master/packaging/installer/methods/pfsense.md
+sidebar_label: "pfSense"
+learn_status: "Published"
+learn_rel_path: "Installation/Install on specific environments"
 -->
 
-# Install Netdata on pfSense
+# Install Netdata on pfSense CE
 
 > 💡 This document is maintained by Netdata's community, and may not be completely up-to-date. Please double-check the
 > details of the installation process, such as version numbers for downloadable packages, before proceeding.
@@ -15,7 +18,8 @@ custom_edit_url: https://github.com/netdata/netdata/edit/master/packaging/instal
 
 ## Install prerequisites/dependencies
 
-To install Netdata on pfSense, first run the following command (within a shell or under the **Diagnostics/Command**
+To install Netdata on pfSense, first enable the [FreeBSD package repo](https://docs.netgate.com/pfsense/en/latest/recipes/freebsd-pkg-repo.html)
+Then run the following command (within a shell or under the **Diagnostics/Command**
 prompt within the pfSense web interface).
 
 ```bash
@@ -25,23 +29,22 @@ pkg install -y pkgconf bash e2fsprogs-libuuid libuv nano
 Then run the following commands to download various dependencies from the FreeBSD repository.
 
 ```sh
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/Judy-1.0.5_2.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/json-c-0.15_1.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-certifi-2020.6.20.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-asn1crypto-1.3.0.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-pycparser-2.20.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-cffi-1.14.3.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-six-1.15.0.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-cryptography-2.6.1.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-idna-2.10.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-openssl-19.0.0.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-pysocks-1.7.1.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-urllib3-1.25.11,1.txz
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-yaml-5.3.1.txz
+pkg install json-c-0.15_1
+pkg install py39-certifi-2023.5.7
+pkg install py39-asn1crypto
+pkg install py39-pycparser
+pkg install py39-cffi
+pkg install py39-six
+pkg install py39-cryptography
+pkg install py39-idna
+pkg install py39-openssl
+pkg install py39-pysocks
+pkg install py39-urllib3
+pkg install py39-yaml
 ```
 
 > ⚠️ If any of the above commands return a `Not Found` error, you need to manually search for the latest package in the
-> [FreeBSD repository](https://www.freebsd.org/ports/). Search for the package's name, such as `py37-cffi`, find the
+> [FreeBSD repository](https://www.freebsd.org/ports/) or by running `pkg search`. Search for the package's name, such as `py37-cffi`, find the
 > latest version number, and update the command accordingly.
 
 > ⚠️ On pfSense 2.4.5, Python version 3.7 may be installed by the system, in which case you should should not install
@@ -56,7 +59,7 @@ pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/py37-yaml-5.3.1.txz
 You can now install Netdata from the FreeBSD repository.
 
 ```bash
-pkg add http://pkg.freebsd.org/FreeBSD:11:amd64/latest/All/netdata-1.28.0.txz
+pkg install netdata
 ```
 
 > ⚠️ If the above command returns a `Not Found` error, you need to manually search for the latest version of Netdata in
@@ -81,4 +84,4 @@ workaround from <https://redmine.pfsense.org/issues/6643>
 
 **Note:** In pfSense, the Netdata configuration files are located under `/usr/local/etc/netdata`.
 
-[![analytics](https://www.google-analytics.com/collect?v=1&aip=1&t=pageview&_s=1&ds=github&dr=https%3A%2F%2Fgithub.com%2Fnetdata%2Fnetdata&dl=https%3A%2F%2Fmy-netdata.io%2Fgithub%2Fpackaging%2Finstaller%2Fmethods%2Fpfsense&_u=MAC~&cid=5792dfd7-8dc4-476b-af31-da2fdb9f93d2&tid=UA-64295674-3)](<>)
+

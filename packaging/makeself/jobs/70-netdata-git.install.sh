@@ -6,13 +6,13 @@
 
 cd "${NETDATA_SOURCE_PATH}" || exit 1
 
-if [ ${NETDATA_BUILD_WITH_DEBUG} -eq 0 ]; then
-  export CFLAGS="-static -O3 -I/openssl-static/include"
+if [ "${NETDATA_BUILD_WITH_DEBUG}" -eq 0 ]; then
+  export CFLAGS="-ffunction-sections -fdata-sections -static -O2 -funroll-loops -I/openssl-static/include -I/libnetfilter-acct-static/include/libnetfilter_acct -I/curl-local/include/curl -I/usr/include/libmnl -pipe"
 else
-  export CFLAGS="-static -O1 -ggdb -Wall -Wextra -Wformat-signedness -fstack-protector-all -D_FORTIFY_SOURCE=2 -DNETDATA_INTERNAL_CHECKS=1 -I/openssl-static/include"
+  export CFLAGS="-static -O1 -pipe -ggdb -Wall -Wextra -Wformat-signedness -DNETDATA_INTERNAL_CHECKS=1 -I/openssl-static/include -I/libnetfilter-acct-static/include/libnetfilter_acct -I/curl-local/include/curl -I/usr/include/libmnl"
 fi
 
-export LDFLAGS="-static -L/openssl-static/lib"
+export LDFLAGS="-Wl,--gc-sections -static -L/openssl-static/lib64 -L/libnetfilter-acct-static/lib -lnetfilter_acct -L/usr/lib -lmnl -L/usr/lib -lzstd -L/curl-local/lib"
 
 # We export this to 'yes', installer sets this to .environment.
 # The updater consumes this one, so that it can tell whether it should update a static install or a non-static one
@@ -20,18 +20,34 @@ export IS_NETDATA_STATIC_BINARY="yes"
 
 # Set eBPF LIBC to "static" to bundle the `-static` variant of the kernel-collector
 export EBPF_LIBC="static"
-export PKG_CONFIG_PATH="/openssl-static/lib/pkgconfig"
+export PKG_CONFIG="pkg-config --static"
+export PKG_CONFIG_PATH="/openssl-static/lib64/pkgconfig:/libnetfilter-acct-static/lib/pkgconfig:/usr/lib/pkgconfig:/curl-local/lib/pkgconfig"
 
 # Set correct CMake flags for building against non-System OpenSSL
 # See: https://github.com/warmcat/libwebsockets/blob/master/READMEs/README.build.md
-export CMAKE_FLAGS="-DOPENSSL_ROOT_DIR=/openssl-static -DOPENSSL_LIBRARIES=/openssl-static/lib -DCMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE=/openssl-static -DLWS_OPENSSL_INCLUDE_DIRS=/openssl-static/include -DLWS_OPENSSL_LIBRARIES=/openssl-static/lib/libssl.a;/openssl-static/lib/libcrypto.a"
+export CMAKE_FLAGS="-DOPENSSL_ROOT_DIR=/openssl-static -DOPENSSL_LIBRARIES=/openssl-static/lib64 -DCMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE=/openssl-static -DLWS_OPENSSL_INCLUDE_DIRS=/openssl-static/include -DLWS_OPENSSL_LIBRARIES=/openssl-static/lib64/libssl.a;/openssl-static/lib64/libcrypto.a"
 
 run ./netdata-installer.sh \
-  --install "${NETDATA_INSTALL_PARENT}" \
+  --install-prefix "${NETDATA_INSTALL_PARENT}" \
   --dont-wait \
   --dont-start-it \
+  --disable-exporting-mongodb \
   --require-cloud \
-  --dont-scrub-cflags-even-though-it-may-break-things
+  --use-system-protobuf \
+  --dont-scrub-cflags-even-though-it-may-break-things \
+  --one-time-build \
+  --disable-logsmanagement \
+  --enable-lto \
+  ${EXTRA_INSTALL_FLAGS:+${EXTRA_INSTALL_FLAGS}} \
+
+# shellcheck disable=SC2015
+[ "${GITHUB_ACTIONS}" = "true" ] && echo "::group::Finishing netdata install" || true
+
+# Properly mark the install type
+cat > "${NETDATA_INSTALL_PATH}/etc/netdata/.install-type" <<-EOF
+	INSTALL_TYPE='manual-static'
+	PREBUILT_ARCH='${BUILDARCH}'
+	EOF
 
 # Remove the netdata.conf file from the tree. It has hard-coded sensible defaults builtin.
 run rm -f "${NETDATA_INSTALL_PATH}/etc/netdata/netdata.conf"
@@ -43,8 +59,5 @@ if run readelf -l "${NETDATA_INSTALL_PATH}"/bin/netdata | grep 'INTERP'; then
   exit 1
 fi
 
-if [ ${NETDATA_BUILD_WITH_DEBUG} -eq 0 ]; then
-  run strip "${NETDATA_INSTALL_PATH}"/bin/netdata
-  run strip "${NETDATA_INSTALL_PATH}"/usr/libexec/netdata/plugins.d/apps.plugin
-  run strip "${NETDATA_INSTALL_PATH}"/usr/libexec/netdata/plugins.d/cgroup-network
-fi
+# shellcheck disable=SC2015
+[ "${GITHUB_ACTIONS}" = "true" ] && echo "::endgroup::" || true

@@ -4,15 +4,15 @@
 # shellcheck source=packaging/makeself/functions.sh
 . "$(dirname "${0}")/../functions.sh" "${@}" || exit 1
 
+# shellcheck disable=SC2015
+[ "${GITHUB_ACTIONS}" = "true" ] && echo "::group::Building self-extracting archive" || true
+
 run cd "${NETDATA_SOURCE_PATH}" || exit 1
 
 # -----------------------------------------------------------------------------
 # find the netdata version
 
-VERSION="$(git describe 2> /dev/null)"
-if [ -z "${VERSION}" ]; then
-  VERSION=$(cat packaging/version)
-fi
+VERSION="$("${NETDATA_INSTALL_PARENT}/netdata/bin/netdata" -v | cut -f 2 -d ' ')"
 
 if [ "${VERSION}" == "" ]; then
   echo >&2 "Cannot find version number. Create makeself executable from source code with git tree structure."
@@ -28,12 +28,6 @@ run cp \
   packaging/makeself/post-installer.sh \
   packaging/makeself/install-or-update.sh \
   packaging/installer/functions.sh \
-  configs.signatures \
-  system/netdata-init-d \
-  system/netdata-lsb \
-  system/netdata-openrc \
-  system/netdata.logrotate \
-  system/netdata.service \
   "${NETDATA_INSTALL_PATH}/system/"
 
 # -----------------------------------------------------------------------------
@@ -53,6 +47,12 @@ EOF
 run chmod 755 "${NETDATA_INSTALL_PATH}/bin/netdata"
 
 # -----------------------------------------------------------------------------
+# the claiming script must be in the same directory as the netdata binary for web-based claiming to work
+
+run ln -s "${NETDATA_INSTALL_PATH}/bin/netdata-claim.sh" \
+  "${NETDATA_INSTALL_PATH}/bin/srv/netdata-claim.sh" || exit 1
+
+# -----------------------------------------------------------------------------
 # copy the SSL/TLS configuration and certificates from the build system
 
 run cp -a /etc/ssl "${NETDATA_INSTALL_PATH}/share/ssl"
@@ -64,6 +64,14 @@ run rm "${NETDATA_INSTALL_PATH}/sbin" \
   "${NETDATA_INSTALL_PATH}/usr/bin" \
   "${NETDATA_INSTALL_PATH}/usr/sbin" \
   "${NETDATA_INSTALL_PATH}/usr/local"
+
+# -----------------------------------------------------------------------------
+# ensure required directories actually exist
+
+for dir in var/lib/netdata var/cache/netdata var/log/netdata ; do
+    run mkdir -p "${NETDATA_INSTALL_PATH}/${dir}"
+    run touch "${NETDATA_INSTALL_PATH}/${dir}/.keep"
+done
 
 # -----------------------------------------------------------------------------
 # create the makeself archive
@@ -90,12 +98,22 @@ run rm "${NETDATA_MAKESELF_PATH}/makeself.lsm.tmp"
 # -----------------------------------------------------------------------------
 # copy it to the netdata build dir
 
-FILE="netdata-${VERSION}.gz.run"
+FILE="netdata-${BUILDARCH}-${VERSION}.gz.run"
 
 run mkdir -p artifacts
 run mv "${NETDATA_INSTALL_PATH}.gz.run" "artifacts/${FILE}"
 
-[ -f netdata-latest.gz.run ] && rm netdata-latest.gz.run
-run ln -s "artifacts/${FILE}" netdata-latest.gz.run
+[ -f "netdata-${BUILDARCH}-latest.gz.run" ] && rm "netdata-${BUILDARCH}-latest.gz.run"
+run ln -s "artifacts/${FILE}" "netdata-${BUILDARCH}-latest.gz.run"
+
+if [ "${BUILDARCH}" = "x86_64" ]; then
+  [ -f "netdata-latest.gz.run" ] && rm "netdata-latest.gz.run"
+  run ln -s "artifacts/${FILE}" "netdata-latest.gz.run"
+  [ -f "artifacts/netdata-${VERSION}.gz.run" ] && rm "netdata-${VERSION}.gz.run"
+  run ln -s "./${FILE}" "artifacts/netdata-${VERSION}.gz.run"
+fi
+
+# shellcheck disable=SC2015
+[ "${GITHUB_ACTIONS}" = "true" ] && echo "::endgroup::" || true
 
 echo >&2 "Self-extracting installer moved to 'artifacts/${FILE}'"

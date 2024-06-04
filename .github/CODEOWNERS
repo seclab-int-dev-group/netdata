@@ -2,65 +2,51 @@
 # This way we prevent modifications which will be overwriten by automation.
 
 # Global (default) code owner
-* @ktsaou @Ferroin
+* @Ferroin
 
 # Ownership by directory structure
-.travis/ @Ferroin @knatsakis @kaskavel @vkalintiris
-.github/ @Ferroin @knatsakis @kaskavel @vkalintiris
-aclk/ @stelfrag @underhood
-backends/ @thiagoftsm @vlvkobal
-backends/graphite/ @thiagoftsm @vlvkobal
-backends/json/ @thiagoftsm @vlvkobal
-backends/opentsdb/ @thiagoftsm @vlvkobal
-backends/prometheus/ @vlvkobal @thiagoftsm
-build/ @Ferroin @knatsakis
-contrib/debian @Ferroin @knatsakis @vkalintiris
-collectors/ @vlvkobal @mfundul
-collectors/charts.d.plugin/ @ilyam8 @Ferroin
-collectors/freebsd.plugin/ @vlvkobal @thiagoftsm
-collectors/ebpf.plugin/ @thiagoftsm @vlvkobal
-collectors/macos.plugin/ @vlvkobal @thiagoftsm
-collectors/node.d.plugin/ @jacekkolasa
-collectors/node.d.plugin/fronius/ @ccremer
-collectors/node.d.plugin/snmp/ @jacekkolasa
-collectors/node.d.plugin/stiebeleltron/ @ccremer
-collectors/python.d.plugin/ @ilyam8
-collectors/cups.plugin/ @simonnagl @vlvkobal @thiagoftsm
-exporting/  @vlvkobal @thiagoftsm
-daemon/ @thiagoftsm @mfundul
-database/ @mfundul @thiagoftsm
-docs/ @joelhans
-health/ @thiagoftsm @vlvkobal
-health/health.d/ @thiagoftsm @vlvkobal
-health/notifications/ @Ferroin @thiagoftsm
-libnetdata/ @thiagofsm @mfundul
-packaging/ @Ferroin @knatsakis @vkalintiris
-registry/ @jacekkolasa
-streaming/ @thiagoftsm @vlvkobal
-system/ @Ferroin @knatsakis @vkalintiris
-tests/ @Ferroin @knatsakis @kaskavel
-web/ @thiagoftsm @mfundul @vlvkobal
-web/gui/ @jacekkolasa
+.github/ @netdata/agent-sre
+src/aclk/ @stelfrag
+src/collectors/ @thiagoftsm
+src/collectors/ebpf.plugin/ @thiagoftsm
+src/collectors/charts.d.plugin/ @ilyam8 @Ferroin
+src/collectors/freebsd.plugin/ @thiagoftsm
+src/collectors/macos.plugin/ @thiagoftsm
+src/collectors/python.d.plugin/ @ilyam8
+src/collectors/cups.plugin/ @thiagoftsm
+src/exporting/ @thiagoftsm
+src/daemon/ @thiagoftsm @vkalintiris
+src/database/ @thiagoftsm @vkalintiris
+docs/ @Ancairon
+src/go/ @ilyam8
+src/health/ @thiagoftsm @vkalintiris
+src/health/health.d/ @thiagoftsm
+src/health/notifications/ @Ferroin @thiagoftsm
+src/ml/ @vkalintiris
+src/libnetdata/ @thiagoftsm @vkalintiris
+packaging/ @netdata/agent-sre
+packaging/cmake @Ferroin @vkalintiris
+src/registry/ @novykh
+src/streaming/ @thiagoftsm
+system/ @netdata/agent-sre
+tests/ @netdata/agent-sre @vkalintiris
+src/web/ @thiagoftsm @vkalintiris
+src/web/gui/ @novykh
+src/logsmanagement/ @thiagoftsm
 
 # Ownership by filetype (overwrites ownership by directory)
-*.am @Ferroin
-*.md @joelhans
-Dockerfile* @Ferroin @knatsakis
+*.md @Ancairon
+*.mdx @Ancairon
+Dockerfile* @netdata/agent-sre
 
 # Ownership of specific files
-.gitignore @Ferroin @knatsakis
-.travis.yml @Ferroin @knatsakis @kaskavel @vkalintiris
-.lgtm.yml @Ferroin @knatsakis
-.eslintrc @Ferroin @knatsakis
-.eslintignore @Ferroin @knatsakis
-.csslintrc @Ferroin @knatsakis
-.codeclimate.yml @Ferroin @knatsakis
-.codacy.yml @Ferroin @knatsakis
-.yamllint.yml @Ferroin @knatsakis
-netdata.spec.in @Ferroin @knatsakis @vkalintiris
-netdata-installer.sh @Ferroin @knatsakis @vkalintiris
-package.json @jacekkolasa @Ferroin @knatsakis
-packaging/version @netdatabot @Ferroin @knatsakis
+.gitignore @netdata/agent-sre @vkalintiris
+.codacy.yml @netdata/agent-sre
+.yamllint.yml @netdata/agent-sre
+CMakeLists.txt @netdata/agent-sre @vkalintiris
+netdata.spec.in @netdata/agent-sre
+netdata-installer.sh @netdata/agent-sre
+packaging/version @netdatabot @netdata/agent-sre
 
-LICENSE.md @joelhans @Ferroin
-CHANGELOG.md @netdatabot @Ferroin
+LICENSE.md @netdata/agent-sre @vkalintiris
+CHANGELOG.md @netdatabot @netdata/agent-sre
